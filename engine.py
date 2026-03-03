@@ -31,6 +31,7 @@ def main():
 
     # Process the CSV data
     generated_count = 0
+    pages = [] # Track generated pages for the index
     try:
         with open(INPUT_CSV, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
@@ -59,9 +60,27 @@ def main():
                 with open(output_path, 'w', encoding='utf-8') as out_file:
                     out_file.write(page_html)
                 
+                pages.append({'title': keyword, 'url': output_filename})
                 generated_count += 1
+        
+        # Generate index.html to prevent 404 on the root
+        index_path = os.path.join(dist_dir, 'index.html')
+        links_html = "".join([f"<li><a href='{p['url']}'>{p['title']}</a></li>" for p in pages])
+        
+        index_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>IELTS Surgical Logic - All Fixes</title></head>
+        <body>
+            <h1>IELTS Surgical Logic: Master Directory</h1>
+            <ul>{links_html}</ul>
+        </body>
+        </html>
+        """
+        with open(index_path, 'w', encoding='utf-8') as f:
+            f.write(index_html)
                 
-        print(f"✅ Successfully generated {generated_count} pages.")
+        print(f"✅ Successfully generated {generated_count} pages and index.html.")
         
     except FileNotFoundError:
         print(f"Error: Data file '{INPUT_CSV}' not found.")

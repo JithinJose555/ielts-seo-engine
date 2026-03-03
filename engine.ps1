@@ -18,6 +18,7 @@ $TemplateContent = Get-Content -Path $TemplatePath -Raw -Encoding UTF8
 $Data = Import-Csv $DataPath
 
 $GeneratedCount = 0
+$Pages = @()
 
 foreach ($Row in $Data) {
     $Keyword = $Row.keyword.Trim()
@@ -43,6 +44,26 @@ foreach ($Row in $Data) {
     
     Write-Host "Generated: $OutputFile"
     $GeneratedCount++
+    $Pages += [PSCustomObject]@{ Title = $Keyword; Url = "$Slug.html" }
 }
 
-Write-Host "`n✅ Engine completed successfully! $GeneratedCount optimized SEO pages generated in the 'dist' folder."
+# Generate index.html to prevent 404
+$IndexLinkHtml = ""
+foreach ($Page in $Pages) {
+    $IndexLinkHtml += "<li><a href='$($Page.Url)'>$($Page.Title)</a></li>"
+}
+
+$IndexHtml = @"
+<!DOCTYPE html>
+<html>
+<head><title>IELTS Surgical Logic - All Fixes</title></head>
+<body>
+    <h1>IELTS Surgical Logic: Master Directory</h1>
+    <ul>$IndexLinkHtml</ul>
+</body>
+</html>
+"@
+
+Set-Content -Path (Join-Path $OutputDir "index.html") -Value $IndexHtml -Encoding UTF8
+
+Write-Host "`n✅ Engine completed successfully! $GeneratedCount optimized SEO pages and index.html generated in the 'dist' folder."
