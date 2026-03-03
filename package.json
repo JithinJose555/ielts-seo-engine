@@ -1,0 +1,8 @@
+{
+    "name": "ielts-seo-engine",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "python3 engine.py",
+        "deploy": "vercel --prod"
+    }
+}
