@@ -80,7 +80,7 @@ def main():
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(index_html)
                 
-        print(f"✅ Successfully generated {generated_count} pages and index.html.")
+        print(f"Successfully generated {generated_count} pages and index.html.")
         
     except FileNotFoundError:
         print(f"Error: Data file '{INPUT_CSV}' not found.")
