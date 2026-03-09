@@ -33,16 +33,16 @@ def main():
     generated_count = 0
     pages = [] # Track generated pages for the index
     try:
-        with open(INPUT_CSV, 'r', encoding='utf-8') as f:
+        with open(INPUT_CSV, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                keyword = row.get('keyword', '').strip()
+                keyword = (row.get('keyword') or '').strip()
                 if not keyword:
                     continue
                 
-                problem_name = row.get('problem_name', '').strip()
-                band_5_example = row.get('band_5_example', '').strip()
-                band_9_fix = row.get('band_9_fix', '').strip()
+                problem_name = (row.get('problem_name') or '').strip()
+                band_5_example = (row.get('band_5_example') or '').strip()
+                band_9_fix = (row.get('band_9_fix') or '').strip()
 
                 # Generate a clean filename for the URL
                 slug = slugify(keyword)
