@@ -43,6 +43,7 @@ def main():
                 
                 problem_name = (row.get('problem_name') or '').strip()
                 band_5_example = (row.get('band_5_example') or '').strip()
+                audit_diagnostic = (row.get('audit_diagnostic') or '').strip()
                 band_9_fix = (row.get('band_9_fix') or '').strip()
 
                 # Generate a clean filename for the URL
@@ -55,6 +56,7 @@ def main():
                 page_html = page_html.replace('{{keyword}}', keyword)
                 page_html = page_html.replace('{{problem_name}}', problem_name)
                 page_html = page_html.replace('{{band_5_example}}', band_5_example)
+                page_html = page_html.replace('{{audit_diagnostic}}', audit_diagnostic)
                 page_html = page_html.replace('{{band_9_fix}}', band_9_fix)
 
                 # Write the customized HTML

@@ -57,7 +57,7 @@ prompts = [
 
 with open(file_path, 'w', encoding='utf-8', newline='') as f:
     writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-    writer.writerow(["keyword", "problem_name", "band_5_example", "band_9_fix"])
+    writer.writerow(["keyword", "problem_name", "band_5_example", "audit_diagnostic", "band_9_fix"])
     
     for i in range(5000):
         pillar = random.choice(list(pillars.keys()))
@@ -71,11 +71,10 @@ with open(file_path, 'w', encoding='utf-8', newline='') as f:
         
         m_raw = logic_dna[pillar]["mistake"].format(s=s_clean.lower())
         
-        # The Auditor + The Master fix
+        # The Auditor + The Master fix separate
         audit = logic_dna[pillar]["audit"]
         fix_raw = logic_dna[pillar]["fix"].format(s=s_clean.lower())
-        full_fix = f"{audit} {fix_raw}"
 
-        writer.writerow([title, "Logical Structural Integrity", m_raw, full_fix])
+        writer.writerow([title, "Logical Structural Integrity", m_raw, audit, fix_raw])
 
-print("Sovereign Logic V3 Engine Complete. 5,000 High-Status Articles Re-Generated.")
+print("Sovereign Logic V4 Engine Complete. Audit and Fix are now separate for better UI.")
