@@ -1,6 +1,7 @@
 import csv
 import os
 import re
+import random
 
 # Configuration for Vercel environment
 INPUT_CSV = 'data.csv'
@@ -60,8 +61,23 @@ def main():
                 with open(output_path, 'w', encoding='utf-8') as out_file:
                     out_file.write(page_html)
                 
-                pages.append({'title': keyword, 'url': output_filename})
+                pages.append({'title': keyword, 'url': output_filename, 'path': output_path})
                 generated_count += 1
+        
+        # SEO Phase: Dynamic Interlinking
+        print("Finalizing SEO Interlinking...")
+        for i, page in enumerate(pages):
+            related = random.sample(pages, min(3, len(pages)))
+            links_html = "".join([f"<a href='{p['url']}' style='color: var(--burgundy);'>{p['title']}</a>" for p in related])
+            
+            with open(page['path'], 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Replace the placeholder in template
+            content = content.replace('<a href="/index.html" style="color: var(--text-muted);">Back to Master Directory</a>', links_html)
+            
+            with open(page['path'], 'w', encoding='utf-8') as f:
+                f.write(content)
         
         # Generate index.html to prevent 404 on the root
         index_path = os.path.join(dist_dir, 'index.html')
