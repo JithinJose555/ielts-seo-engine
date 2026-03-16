@@ -98,55 +98,84 @@ def main():
             f.write(sitemap_footer)
         
         # Generate Categorized index.html
-        print("Generating Categorized index.html...")
+        print("Generating Comprehensive Categorized index.html...")
         index_path = os.path.join(dist_dir, 'index.html')
         
-        # Simple grouping by the first word of the title or keyword
-        categories = {}
+        # Robust grouping by Pillar
+        categories = {
+            "Education": [], "Economics": [], "Technology": [], 
+            "Governance": [], "Environment": [], "Society": [], "General": []
+        }
+        
         for p in pages:
-            cat = "General"
-            for pillar in ["Education", "Economics", "Technology", "Governance", "Environment", "Society"]:
-                if pillar in p['title']:
-                    cat = pillar
+            found = False
+            # Check p['title'] for keywords from our pillars
+            for pillar in categories.keys():
+                if pillar.lower() in p['title'].lower():
+                    categories[pillar].append(p)
+                    found = True
                     break
-            if cat not in categories: categories[cat] = []
-            categories[cat].append(p)
+            if not found:
+                categories["General"].append(p)
 
         cat_html = ""
+        total_links = 0
         for cat, items in categories.items():
-            links = "".join([f"<li><a href='{p['url']}'>{p['title']}</a></li>" for p in items[:20]]) # Show top 20 per cat for speed
-            cat_html += f"<h2>{cat} Fixes</h2><ul>{links}</ul>"
+            if not items: continue
+            links = "".join([f"<li><a href='{p['url']}'>{p['title']}</a></li>" for p in items])
+            total_links += len(items)
+            cat_html += f"""
+            <section class="category-block">
+                <h2>{cat} Logic Audits ({len(items)})</h2>
+                <ul class="link-grid">{links}</ul>
+            </section>
+            """
 
         index_html = f"""
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>IELTS Surgical Logic - 5,000 Band 9.0 Fixes</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="description" content="Master IELTS Writing Task 2 with our comprehensive directory of 5,000 surgical logic audits. Band 9.0 expert fixes for every topic.">
+            <title>IELTS Surgical Logic - 5,000 Band 9.0 Fixes | Master Directory</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
             <style>
-                body {{ font-family: 'Inter', sans-serif; padding: 50px; line-height: 1.6; background: #f5f7fa; color: #1a1a1a; }}
-                h1 {{ color: #800020; border-bottom: 2px solid #800020; padding-bottom: 10px; }}
-                h2 {{ margin-top: 40px; color: #5c0015; text-transform: uppercase; font-size: 1.2rem; letter-spacing: 1px; }}
-                ul {{ list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }}
-                li a {{ text-decoration: none; color: #666; font-size: 0.95rem; }}
-                li a:hover {{ color: #800020; text-decoration: underline; }}
+                :root {{ --burgundy: #800020; --text-main: #1a1a1a; --bg: #f5f7fa; }}
+                body {{ font-family: 'Inter', sans-serif; padding: 2rem; background: var(--bg); color: var(--text-main); line-height: 1.6; max-width: 1200px; margin: 0 auto; }}
+                header {{ text-align: center; margin-bottom: 4rem; padding: 3rem; background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }}
+                h1 {{ font-weight: 800; font-size: 2.5rem; color: var(--burgundy); margin-bottom: 1rem; }}
+                .stats {{ font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 1px; }}
+                .category-block {{ margin-bottom: 3rem; }}
+                h2 {{ color: var(--burgundy); border-bottom: 2px solid var(--burgundy); padding-bottom: 10px; margin-bottom: 20px; font-size: 1.5rem; }}
+                .link-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; list-style: none; padding: 0; }}
+                li a {{ text-decoration: none; color: #444; font-size: 0.9rem; transition: color 0.2s; display: block; padding: 5px; border-radius: 4px; }}
+                li a:hover {{ color: var(--burgundy); background: #eee; }}
+                footer {{ margin-top: 5rem; text-align: center; padding: 2rem; border-top: 1px solid #ddd; color: #666; }}
             </style>
         </head>
         <body>
-            <h1>IELTS Surgical Logic: The 5,000 Master Directory</h1>
-            <p>Access the highest-density logical audits for IELTS Writing Task 2. Select a category to begin your reset.</p>
-            {cat_html}
-            <div style="margin-top: 50px; padding: 20px; background: #fff; border: 1px solid #ddd;">
-                <p><strong>Total Audits Live: 5,000+</strong> | Updated Daily for Maximum Visibility</p>
-                <a href="/sitemap.xml">XML Sitemap for Search Engines</a>
-            </div>
+            <header>
+                <h1>IELTS Surgical Logic</h1>
+                <p class="stats">The Sovereign Standard: {total_links} Unique Logical Fixes Live</p>
+                <p>Don't let Band 6.5 logic kill your score. Browse our 5,000+ expert audits to find your specific logic-fix.</p>
+            </header>
+            
+            <main>
+                {cat_html}
+            </main>
+
+            <footer>
+                <p>&copy; 2026 Jithin Jose - IELTS Surgical Logic Auditor</p>
+                <p><a href="/sitemap.xml" style="color: var(--burgundy);">XML Sitemap for Search Engines</a></p>
+            </footer>
         </body>
         </html>
         """
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(index_html)
                 
-        print(f"Successfully generated {generated_count} pages, sitemap.xml, and categorized index.")
+        print(f"Successfully generated {generated_count} pages, sitemap.xml, and a comprehensive index with {total_links} unique links.")
         
     except FileNotFoundError:
         print(f"Error: Data file '{INPUT_CSV}' not found.")
