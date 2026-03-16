@@ -67,8 +67,8 @@ def main():
         # SEO Phase: Dynamic Interlinking
         print("Finalizing SEO Interlinking...")
         for i, page in enumerate(pages):
-            related = random.sample(pages, min(3, len(pages)))
-            links_html = "".join([f"<a href='{p['url']}' style='color: var(--burgundy);'>{p['title']}</a>" for p in related])
+            related = random.sample(pages, min(5, len(pages)))
+            links_html = "".join([f"<a href='{p['url']}' style='color: var(--burgundy); margin-right: 15px; text-decoration: none; font-weight: 600;'>&rarr; {p['title']}</a>" for p in related])
             
             with open(page['path'], 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -78,25 +78,73 @@ def main():
             
             with open(page['path'], 'w', encoding='utf-8') as f:
                 f.write(content)
+
+        # Generate sitemap.xml for Google indexing
+        print("Generating sitemap.xml...")
+        sitemap_path = os.path.join(dist_dir, 'sitemap.xml')
+        sitemap_header = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        sitemap_footer = '</urlset>'
         
-        # Generate index.html to prevent 404 on the root
+        # Replace base_url with your actual vercel domain later
+        base_url = "https://ielts-seo-engine.vercel.app/" 
+        
+        with open(sitemap_path, 'w', encoding='utf-8') as f:
+            f.write(sitemap_header)
+            f.write(f'  <url><loc>{base_url}</loc><priority>1.0</priority></url>\n')
+            for p in pages:
+                f.write(f'  <url><loc>{base_url}{p["url"]}</loc><priority>0.8</priority></url>\n')
+            f.write(sitemap_footer)
+        
+        # Generate Categorized index.html
+        print("Generating Categorized index.html...")
         index_path = os.path.join(dist_dir, 'index.html')
-        links_html = "".join([f"<li><a href='{p['url']}'>{p['title']}</a></li>" for p in pages])
         
+        # Simple grouping by the first word of the title or keyword
+        categories = {}
+        for p in pages:
+            cat = "General"
+            for pillar in ["Education", "Economics", "Technology", "Governance", "Environment", "Society"]:
+                if pillar in p['title']:
+                    cat = pillar
+                    break
+            if cat not in categories: categories[cat] = []
+            categories[cat].append(p)
+
+        cat_html = ""
+        for cat, items in categories.items():
+            links = "".join([f"<li><a href='{p['url']}'>{p['title']}</a></li>" for p in items[:20]]) # Show top 20 per cat for speed
+            cat_html += f"<h2>{cat} Fixes</h2><ul>{links}</ul>"
+
         index_html = f"""
         <!DOCTYPE html>
-        <html>
-        <head><title>IELTS Surgical Logic - All Fixes</title></head>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>IELTS Surgical Logic - 5,000 Band 9.0 Fixes</title>
+            <style>
+                body {{ font-family: 'Inter', sans-serif; padding: 50px; line-height: 1.6; background: #f5f7fa; color: #1a1a1a; }}
+                h1 {{ color: #800020; border-bottom: 2px solid #800020; padding-bottom: 10px; }}
+                h2 {{ margin-top: 40px; color: #5c0015; text-transform: uppercase; font-size: 1.2rem; letter-spacing: 1px; }}
+                ul {{ list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }}
+                li a {{ text-decoration: none; color: #666; font-size: 0.95rem; }}
+                li a:hover {{ color: #800020; text-decoration: underline; }}
+            </style>
+        </head>
         <body>
-            <h1>IELTS Surgical Logic: Master Directory</h1>
-            <ul>{links_html}</ul>
+            <h1>IELTS Surgical Logic: The 5,000 Master Directory</h1>
+            <p>Access the highest-density logical audits for IELTS Writing Task 2. Select a category to begin your reset.</p>
+            {cat_html}
+            <div style="margin-top: 50px; padding: 20px; background: #fff; border: 1px solid #ddd;">
+                <p><strong>Total Audits Live: 5,000+</strong> | Updated Daily for Maximum Visibility</p>
+                <a href="/sitemap.xml">XML Sitemap for Search Engines</a>
+            </div>
         </body>
         </html>
         """
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(index_html)
                 
-        print(f"Successfully generated {generated_count} pages and index.html.")
+        print(f"Successfully generated {generated_count} pages, sitemap.xml, and categorized index.")
         
     except FileNotFoundError:
         print(f"Error: Data file '{INPUT_CSV}' not found.")
