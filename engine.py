@@ -1,6 +1,7 @@
 import csv
 import os
 import re
+import shutil
 import random
 
 # Configuration for Vercel environment
@@ -21,6 +22,12 @@ def main():
     dist_dir = 'dist'
     if not os.path.exists(dist_dir):
         os.makedirs(dist_dir)
+
+    # Copy verification files to dist
+    for file in os.listdir('.'):
+        if file.startswith('google') and file.endswith('.html'):
+            shutil.copy(file, os.path.join(dist_dir, file))
+            print(f"Copied verification file: {file}")
 
     # Read the master template
     try:
